@@ -1,7 +1,3 @@
---Connect to the running PostgreSQL container using psql CLI
-docker exec -it pgvector-quick psql -U postgres
-
-
 --Inside the psql shell, enable the pgvector extension (only needs to be done once per database)
 CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -22,6 +18,9 @@ INSERT INTO products (name, description, description_embedding) VALUES
 
 -- Create HNSW index on the vector column
 CREATE INDEX ON products USING hnsw (description_embedding vector_l2_ops);
+
+-- Temporarily turn off seq scan for testing index
+SET enable_seqscan = off;
 
 -- Perform a vector similarity search using the <-> (Euclidean distance) operator
 -- Retrieve the top 3 products closest to the query vector [0.88,0.12,0.2]
