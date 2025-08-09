@@ -1,4 +1,4 @@
-### **2. `scripts/run_yugabyte.sh`**
+### **2. `scripts/docker-setup.sh`**
 #!/bin/bash
 set -e
 
