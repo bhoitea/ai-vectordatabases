@@ -10,13 +10,6 @@ This repository contains a quick demo showing how to:
 
 ---
 
-## 📂 Files in this Repo
-
-| File                        | Description                                                                                           |
-| --------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `scripts/docker-setup.sh` | Script to pull and run PostgreSQL with pgvector in Docker                                             |
-| scripts/sample-products.sql | SQL commands to enable pgvector, create table, insert data, index vectors, and run similarity queries |
-
 ## 📂 Project Structure
 
 ```
