@@ -1,103 +1,116 @@
-# Pinecone Demo
+# Chapter 3 - Milvus + Zilliz Cloud Demo
 
-This repository demonstrates how to:
-
-* Connect to Pinecone with an API key
-* Create and delete indexes
-* Upsert vectors with metadata
-* Perform similarity search
-* Apply metadata filters for hybrid queries
-* Understand cosine similarity scores
-
----
+This repository demonstrates how to use **Milvus** for vector similarity search,
+both in a **self-hosted setup (Docker)** and in **Zilliz Cloud (managed Milvus)**.
 
 ## 📂 Project Structure
 
-<pre class="overflow-visible!" data-start="468" data-end="638"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><span class="" data-state="closed"></span></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>Chapter1-Pinecone/
-│
-├── scripts/
-│   └── pinecone_demo.py        # Script </span><span>to</span><span></span><span>create</span><span></span><span>index</span><span>, </span><span>insert</span><span> data, run queries
-│
-└── README.md                   # This file
-</span></span></code></div></div></pre>
-
----
-
-## 🚀 Quick Start
-
-### 1️⃣ Install dependencies
-
 ```
-pip install pinecone
+Chapter3-Milvus/
+├── README.md
+├── requirements.txt
+└── scripts/
+    ├── milvus-selfhosted-demo.py
+    └── zillizcloud-demo.py
 ```
 
 ---
 
-### 2️⃣ Set your API key
+## **Install Milvus in Docker**
 
-Update `pinecone_demo.py` with your Pinecone API key:
+Run the following commands:
 
 ```
-pc = Pinecone(api_key="pcsk_3g5ZMv_ZEf5gFp1bLeGF*******", environment="us-east-1-aws")**
+pip install -U pymilvus
 ```
+
+Download Milvus standalone script
+
+```
+curl -sfL https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh -o standalone_embed.sh
+```
+
+Start Milvus. This script runs Docker containers (Milvus standalone + dependencies).
+
+```
+bash standalone_embed.sh start
+```
+
+If you encounter a **Docker mount permission error** like:
+
+```
+docker: Error response from daemon: error while creating mount source path ... permission denied.
+```
+
+✅  **Fix (macOS Docker Desktop users)** :
+
+Switch file-sharing to **gRPC-FUSE**
+
+* Open **Docker Desktop → Settings → General**
+* Enable **Use gRPC-FUSE for file sharing**
+* Apply and **Restart Docker**
+
+Then run:
+
+```
+mkdir -p ~/milvus/volumes
+chmod -R 777 ~/milvus/volumes
+bash standalone_embed.sh start
+```
+
+If successful, you should see:
+
+Wait for Milvus Starting...
+Start successfully.
+
+📌  **Default configuration after startup** :
+
+* **Milvus Server** : `localhost:19530`
+* **Embedded etcd** : port `2379`
+* **Data volume** : `~/milvus/volumes`
+* **WebUI** : [http://127.0.0.1:9091/webui/](http://127.0.0.1:9091/webui/)
 
 ---
 
-### 3️⃣ Run the demo
+## 🚀 Self-hosted Demo
 
+Run the Python demo:
+
+```bash
+python milvus-selfhosted-demo.py
 ```
-python3 scripts/pinecone_demo.py
-```
 
-This will:
+This script will:
 
-* Create a Pinecone index
-* Insert 3 sample vectors (A, B, C) with metadata
-* Query with a vector and metadata filter
-* Return similarity results
+- Create a collection with embeddings
+- Insert sample data
+- Run similarity search queries
 
 ---
 
-## 🔍 Example Similarity Query
+## ☁️ Zilliz Cloud Setup
 
-<pre class="overflow-visible!" data-start="1143" data-end="1316"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><span class="" data-state="closed"></span></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-python"><span><span>query_response = index.query(
-    vector=[</span><span>0.11</span><span>] * </span><span>1536</span><span>,
-    top_k=</span><span>2</span><span>,
-    include_metadata=</span><span>True</span><span>,
-    </span><span>filter</span><span>={</span><span>"genre"</span><span>: {</span><span>"$eq"</span><span>: </span><span>"comedy"</span><span>}}
-)
-</span><span>print</span><span>(query_response)
-</span></span></code></div></div></pre>
+1. Sign up at [https://zilliz.com/cloud](https://zilliz.com/cloud)
+2. Create a free cluster
+3. Copy the **API key** and **endpoint**
+4. Update the values in `zillizcloud-demo.py`
 
+Run the demo:
 
-
+```bash
+python zillizcloud-demo.py
 ```
-query_response = index.query(   
-vector=[0.11] * 1536,   
-top_k=2,   
-include_metadata=True,   
-filter={"genre": {"$eq": "comedy"}} ) print(query_response)
-```
+
+This script will:
+
+- Use the default embedding function
+- Insert and query vectors
+- Demonstrate semantic search
 
 ---
 
-## ✅ Expected Output
+## 🗂 References
 
-The query vector `[0.11] * 1536` is very close to:
-
-* **A** → `[0.1] * 1536` (comedy)
-* **B** → `[0.15] * 1536` (comedy)
-
-But far from:
-
-* **C** → `[0.5] * 1536` (thriller, excluded by filter)
-
-So the result will include **A and B** with similarity ≈  **1.0** , excluding  **C** .
-
----
-
-## References
-
-* Pinecone Database:  https://docs.pinecone.io/guides/get-started/overview
-* Pinecone Assistant:[https://docs.pinecone.io/guides/assistant/overview](https://docs.pinecone.io/guides/assistant/overview)
-* SDK Reference –SDKs (Python, Node.js, etc.) and API usage. [https://docs.pinecone.io/reference/pinecone-sdks](https://docs.pinecone.io/reference/pinecone-sdks)
+- Milvus open-source database: [https://milvus.io/docs/overview.md](https://milvus.io/docs/overview.md)
+- Zilliz Cloud(fully managed Milvus cloud): [https://docs.zilliz.com/docs/home](https://docs.zilliz.com/docs/home)
+- Integrations: [https://milvus.io/docs/integrations_overview.md](https://milvus.io/docs/integrations_overview.md)

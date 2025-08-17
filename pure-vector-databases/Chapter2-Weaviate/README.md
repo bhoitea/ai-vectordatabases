@@ -1,103 +1,85 @@
-# Pinecone Demo
+# Weaviate Semantic Search Demos
 
-This repository demonstrates how to:
-
-* Connect to Pinecone with an API key
-* Create and delete indexes
-* Upsert vectors with metadata
-* Perform similarity search
-* Apply metadata filters for hybrid queries
-* Understand cosine similarity scores
+This chapter demonstrates how to use **Weaviate** for semantic search, both in local (self-hosted) and cloud environments.
 
 ---
 
 ## 📂 Project Structure
 
-<pre class="overflow-visible!" data-start="468" data-end="638"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><span class="" data-state="closed"></span></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>Chapter1-Pinecone/
+```warp-runnable-command
+Chapter2-Weaviate/
 │
 ├── scripts/
-│   └── pinecone_demo.py        # Script </span><span>to</span><span></span><span>create</span><span></span><span>index</span><span>, </span><span>insert</span><span> data, run queries
+│   ├── docker-run.sh                       # Start Weaviate in Docker
+│   ├── self_hosted_telecom_demo.py         # Telecom Call Summary Semantic Search (local demo)
+│   └── cloud_jeopardy_semantic_search_demo.py # Jeopardy! Q&A search (cloud demo)
 │
-└── README.md                   # This file
-</span></span></code></div></div></pre>
+└── README.md                               # This file
+```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1️⃣ Install dependencies
+### 1️⃣ Run Weaviate in Docker
 
+```warp-runnable-command
+docker run -p 8081:8080 -p 50051:50051 cr.weaviate.io/semitechnologies/weaviate:1.31.5
 ```
-pip install pinecone
+
+Once started, confirm readiness:
+
+```warp-runnable-command
+curl -i http://localhost:8081/v1/.well-known/live
+```
+
+Expected response:
+
+```warp-runnable-command
+HTTP/1.1 200 OK
+Date: Sat, 12 Jul 2025 14:40:54 GMT
+Content-Length: 0
+```
+
+Once started, confirm readiness using [http://localhost:8081/v1](http://localhost:8081/v1) URL:
+
+---
+
+### 2️⃣ Install Python Client
+
+Weaviate’s Python client works with Python  **3.8+** . Install from PyPI:
+
+```warp-runnable-command
+pip install -U weaviate-client
 ```
 
 ---
 
-### 2️⃣ Set your API key
+### 3️⃣ Run Telecom Call Summary Search (Local Demo)
 
-Update `pinecone_demo.py` with your Pinecone API key:
+```warp-runnable-command
+python scripts/self_hosted_telecom_demo.py
+```
 
-```
-pc = Pinecone(api_key="pcsk_3g5ZMv_ZEf5gFp1bLeGF*******", environment="us-east-1-aws")**
-```
+This script connects to your **local Docker Weaviate instance** and demonstrates telecom call summary semantic search.
 
 ---
 
-### 3️⃣ Run the demo
+### 4️⃣ Run Jeopardy! Q&A Search (Cloud Demo)
 
+```warp-runnable-command
+python scripts/cloud_jeopardy_semantic_search_demo.py
 ```
-python3 scripts/pinecone_demo.py
-```
 
-This will:
-
-* Create a Pinecone index
-* Insert 3 sample vectors (A, B, C) with metadata
-* Query with a vector and metadata filter
-* Return similarity results
+This script connects to a **cloud-hosted Weaviate instance** and demonstrates Jeopardy-style semantic Q&A search.
 
 ---
 
-## 🔍 Example Similarity Query
+## 📑 References
 
-<pre class="overflow-visible!" data-start="1143" data-end="1316"><div class="contain-inline-size rounded-2xl relative bg-token-sidebar-surface-primary"><div class="sticky top-9"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"><span class="" data-state="closed"></span></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre! language-python"><span><span>query_response = index.query(
-    vector=[</span><span>0.11</span><span>] * </span><span>1536</span><span>,
-    top_k=</span><span>2</span><span>,
-    include_metadata=</span><span>True</span><span>,
-    </span><span>filter</span><span>={</span><span>"genre"</span><span>: {</span><span>"$eq"</span><span>: </span><span>"comedy"</span><span>}}
-)
-</span><span>print</span><span>(query_response)
-</span></span></code></div></div></pre>
-
-
-
-```
-query_response = index.query(   
-vector=[0.11] * 1536,   
-top_k=2,   
-include_metadata=True,   
-filter={"genre": {"$eq": "comedy"}} ) print(query_response)
-```
-
----
-
-## ✅ Expected Output
-
-The query vector `[0.11] * 1536` is very close to:
-
-* **A** → `[0.1] * 1536` (comedy)
-* **B** → `[0.15] * 1536` (comedy)
-
-But far from:
-
-* **C** → `[0.5] * 1536` (thriller, excluded by filter)
-
-So the result will include **A and B** with similarity ≈  **1.0** , excluding  **C** .
-
----
-
-## References
-
-* Pinecone Database:  https://docs.pinecone.io/guides/get-started/overview
-* Pinecone Assistant:[https://docs.pinecone.io/guides/assistant/overview](https://docs.pinecone.io/guides/assistant/overview)
-* SDK Reference –SDKs (Python, Node.js, etc.) and API usage. [https://docs.pinecone.io/reference/pinecone-sdks](https://docs.pinecone.io/reference/pinecone-sdks)
+* Weaviate Database Documentation:[https://docs.weaviate.io/weaviate](https://docs.weaviate.io/weaviate)
+* Weaviate Cloud Documentation: [https://docs.weaviate.io/cloud](https://docs.weaviate.io/cloud)
+* Concepts and Architecture: [https://docs.weaviate.io/weaviate/concepts](https://docs.weaviate.io/weaviate/concepts)
+* Model Integrations:[https://docs.weaviate.io/weaviate/model-providers](https://docs.weaviate.io/weaviate/model-providers)
+* API Reference:[https://docs.weaviate.io/weaviate/config-refs](https://docs.weaviate.io/weaviate/config-refs)
+* Installation Guides:[https://docs.weaviate.io/deploy/installation-guides](https://docs.weaviate.io/deploy/installation-guides)

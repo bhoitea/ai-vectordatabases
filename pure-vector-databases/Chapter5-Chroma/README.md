@@ -3,7 +3,7 @@
 This repository demonstrates how to:
 
 * Connect to Pinecone with an API key
-* Create and delete indexes
+* Create indexes
 * Upsert vectors with metadata
 * Perform similarity search
 * Apply metadata filters for hybrid queries
@@ -68,8 +68,6 @@ This will:
 )
 </span><span>print</span><span>(query_response)
 </span></span></code></div></div></pre>
-
-
 
 ```
 query_response = index.query(   
